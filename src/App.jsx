@@ -148,18 +148,48 @@ export default function App() {
           <div id="act3-photowall">
             <Act3_PhotoWall />
           </div>
+
+          {/* Spacer — gentle transition between photo wall and letter */}
+          <div className="relative z-10 h-48 flex items-center justify-center">
+            <motion.div
+              className="text-starlight/20 text-sm tracking-[0.3em] font-serif"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              ↓
+            </motion.div>
+          </div>
+
           <div id="act4-letter">
             <Act4_Letter />
           </div>
+
+          {/* Spacer — transition to cake */}
+          <div className="relative z-10 h-48 flex items-center justify-center">
+            <motion.div
+              className="text-starlight/20 text-sm tracking-[0.3em] font-serif"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              ↓
+            </motion.div>
+          </div>
+
           <div id="act5-cake">
             <Act5_Cake onFireworks={handleFireworks} />
           </div>
+
+          {/* Spacer — transition to finale */}
+          <div className="relative z-10 h-32" />
+
           <div id="act6-finale">
             <Act6_Finale />
           </div>
 
           {/* Footer */}
-          <footer className="relative z-10 text-center py-16 text-starlight/20 text-xs tracking-[0.2em] font-serif">
+          <footer className="relative z-10 text-center py-24 text-starlight/20 text-xs tracking-[0.2em] font-serif">
             Made with 💛 for 黄水玲 · {new Date().getFullYear()}
           </footer>
         </motion.div>

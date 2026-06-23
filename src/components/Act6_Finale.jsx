@@ -106,31 +106,54 @@ export default function Act6_Finale({ onMeteorClick }) {
       className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6"
       onClick={handleFinaleClick}
     >
-      {/* Star click target areas (subtle) — for Easter Egg #1 */}
+      {/* ✦ Twinkling stars — clickable for Easter Egg #1 ✦ */}
       {!meteorDiscovered && (
         <>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <motion.div
-              key={`star-${i}`}
-              className="fixed w-10 h-10 rounded-full cursor-pointer"
-              style={{
-                top: `${15 + (i * 11) % 75}%`,
-                left: `${10 + (i * 13) % 80}%`,
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleStarClick();
-              }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{
-                repeat: Infinity,
-                duration: 2 + i * 0.3,
-                delay: i * 0.5,
-              }}
-            >
-              <span className="text-starlight/30 text-xs">✦</span>
-            </motion.div>
-          ))}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const positions = [
+              { top: '8%', left: '15%' },
+              { top: '12%', left: '75%' },
+              { top: '25%', left: '85%' },
+              { top: '30%', left: '8%' },
+              { top: '45%', left: '92%' },
+              { top: '55%', left: '5%' },
+              { top: '68%', left: '88%' },
+              { top: '78%', left: '20%' },
+            ];
+            const { top, left } = positions[i];
+            return (
+              <motion.button
+                key={`star-${i}`}
+                className="fixed z-30 cursor-pointer bg-transparent border-0 outline-none
+                           flex items-center justify-center"
+                style={{ top, left, width: 44, height: 44 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStarClick();
+                }}
+                animate={{
+                  scale: [1, 1.25, 1],
+                  filter: [
+                    'drop-shadow(0 0 3px rgba(255,215,0,0.4))',
+                    'drop-shadow(0 0 8px rgba(255,215,0,0.8))',
+                    'drop-shadow(0 0 3px rgba(255,215,0,0.4))',
+                  ],
+                }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 2 + i * 0.35,
+                  delay: i * 0.4,
+                  ease: 'easeInOut',
+                }}
+                whileHover={{ scale: 1.5 }}
+                aria-label="星星"
+              >
+                <span className="text-xl sm:text-2xl text-starlight-gold select-none">
+                  ✦
+                </span>
+              </motion.button>
+            );
+          })}
         </>
       )}
 
