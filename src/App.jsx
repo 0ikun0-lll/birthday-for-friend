@@ -13,34 +13,31 @@ import { timeBonusEgg } from './data/easterEggData';
 
 /**
  * Advanced Easter Egg #5 — 60-second auto-trigger.
- * If user stays on page for 60+ seconds, a subtle hidden message appears.
+ * Timer starts only after candles are blown out (when `started` becomes true).
  */
-function TimeBonusOverlay() {
+function TimeBonusOverlay({ started }) {
   const [visible, setVisible] = useState(false);
-  const [phase, setPhase] = useState(0); // 0: line1, 1: line2, 2: fade
+  const [phase, setPhase] = useState(0);
   const { discovered, markDiscovered } = useEasterEgg('time_bonus');
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (discovered) return;
+    if (!started || discovered) return;
 
     timerRef.current = setTimeout(() => {
       setVisible(true);
       markDiscovered();
       setPhase(0);
 
-      // Show line 2 after pause
       setTimeout(() => setPhase(1), timeBonusEgg.pauseBetween);
-      // Fade out
       setTimeout(() => setPhase(2), timeBonusEgg.pauseBetween + 3000);
-      // Remove
       setTimeout(() => setVisible(false), timeBonusEgg.pauseBetween + timeBonusEgg.fadeOutDelay);
     }, timeBonusEgg.delay);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [discovered, markDiscovered]);
+  }, [started, discovered, markDiscovered]);
 
   if (!visible) return null;
 
@@ -90,6 +87,7 @@ function TimeBonusOverlay() {
 export default function App() {
   const [scene, setScene] = useState(0);
   const [showActs36, setShowActs36] = useState(false);
+  const [timerStarted, setTimerStarted] = useState(false);
 
   // Act 1 → Act 2
   const handleOpenGift = useCallback(() => {
@@ -99,7 +97,6 @@ export default function App() {
   // Act 2 → scroll to Acts 3-6
   const handleGiftOpened = useCallback(() => {
     setShowActs36(true);
-    // Smooth scroll to the photo wall
     setTimeout(() => {
       const photoSection = document.getElementById('act3-photowall');
       if (photoSection) {
@@ -108,15 +105,17 @@ export default function App() {
     }, 300);
   }, []);
 
-  // Act 5 → Act 6
+  // Act 5 candles blown → scroll to finale + start 60s timer
   const handleFireworks = useCallback(() => {
-    const finaleSection = document.getElementById('act6-finale');
-    if (finaleSection) {
-      finaleSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    setTimerStarted(true);
+    setTimeout(() => {
+      const finaleSection = document.getElementById('act6-finale');
+      if (finaleSection) {
+        finaleSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   }, []);
 
-  // Scroll reveal for Acts 3-6
   return (
     <div className="relative min-h-screen bg-night overflow-x-hidden">
       {/* Persistent starry background */}
@@ -125,8 +124,8 @@ export default function App() {
       {/* Music player */}
       <MusicPlayer />
 
-      {/* Advanced Easter Egg #5 — 60-second bonus */}
-      <TimeBonusOverlay />
+      {/* Easter Egg #5 — 60s timer starts after blowing out candles */}
+      <TimeBonusOverlay started={timerStarted} />
 
       {/* ——— SCENE 0-1: Full-screen acts ——— */}
       <AnimatePresence mode="wait">
@@ -138,55 +137,51 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* ——— SCENES 3-6: Scroll-based sections ——— */}
+      {/* ——— SCENES 3-6: Scroll-based sections with snap ——— */}
       {showActs36 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          <div id="act3-photowall">
+          {/* ====== Photo Wall ====== */}
+          <section id="act3-photowall" className="snap-section">
             <Act3_PhotoWall />
-          </div>
-
-          {/* Spacer — gentle transition between photo wall and letter */}
-          <div className="relative z-10 h-48 flex items-center justify-center">
+            {/* Pause hint at the bottom of photo grid */}
             <motion.div
-              className="text-starlight/20 text-sm tracking-[0.3em] font-serif"
+              className="text-center pb-24"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
             >
-              ↓
+              <p className="text-starlight/25 text-sm tracking-[0.3em] font-serif">
+                继续往下翻，还有惊喜
+              </p>
+              <motion.p
+                className="text-starlight/15 text-lg mt-2"
+                animate={{ y: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+              >
+                ↓
+              </motion.p>
             </motion.div>
-          </div>
+          </section>
 
-          <div id="act4-letter">
+          {/* ====== Letter ====== */}
+          <section id="act4-letter" className="snap-section">
             <Act4_Letter />
-          </div>
+          </section>
 
-          {/* Spacer — transition to cake */}
-          <div className="relative z-10 h-48 flex items-center justify-center">
-            <motion.div
-              className="text-starlight/20 text-sm tracking-[0.3em] font-serif"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              ↓
-            </motion.div>
-          </div>
-
-          <div id="act5-cake">
+          {/* ====== Cake ====== */}
+          <section id="act5-cake" className="snap-section">
             <Act5_Cake onFireworks={handleFireworks} />
-          </div>
+          </section>
 
-          {/* Spacer — transition to finale */}
-          <div className="relative z-10 h-32" />
-
-          <div id="act6-finale">
+          {/* ====== Finale ====== */}
+          <section id="act6-finale" className="snap-section">
             <Act6_Finale />
-          </div>
+          </section>
 
           {/* Footer */}
           <footer className="relative z-10 text-center py-24 text-starlight/20 text-xs tracking-[0.2em] font-serif">
