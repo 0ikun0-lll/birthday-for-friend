@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx tailwindcss *)",
+      "Bash(mkdir -p src/components src/hooks src/data public/photos public/music)",
+      "Bash(cp \"C:\\\\Users\\\\lenovoThinkPad\\\\Desktop\\\\生日墙图片\"/* public/photos/)"
+    ]
+  }
+}
