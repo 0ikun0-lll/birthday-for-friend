@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 /**
  * Fixed-position music toggle button.
  * Renders in the bottom-right corner with a spinning animation when playing.
@@ -11,7 +13,7 @@ export default function MusicPlayer() {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    const audio = new Audio('/music/bg-music.mp3');
+    const audio = new Audio(`${BASE_URL}music/bg-music.mp3`);
     audio.loop = true;
     audio.volume = 0.3;
     audioRef.current = audio;
